@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Historique{% endblock %}
+
+{% block content %}
+<h1>Historique des cycles</h1>
+
+{% if cycle_courant %}
+<div class="card">
+  <h2>Cycle en cours</h2>
+  <p>Début des règles : <strong>{{ cycle_courant.date_debut_regles.strftime('%d/%m/%Y') }}</strong></p>
+  <form method="POST" class="inline-form">
+    {{ form_cloture.hidden_tag() }}
+    <input type="hidden" name="action" value="cloturer">
+    <div class="form-row">
+      <div class="form-group">
+        {{ form_cloture.date_fin.label }}
+        {{ form_cloture.date_fin(type="date") }}
+      </div>
+      {{ form_cloture.submit(class_="btn btn-primary") }}
+    </div>
+  </form>
+</div>
+{% else %}
+<div class="card">
+  <h2>Démarrer un nouveau cycle</h2>
+  <form method="POST">
+    {{ form_nouveau.hidden_tag() }}
+    <input type="hidden" name="action" value="nouveau">
+    <div class="form-row">
+      <div class="form-group">
+        {{ form_nouveau.date_debut_regles.label }}
+        {{ form_nouveau.date_debut_regles(type="date") }}
+      </div>
+      {{ form_nouveau.submit(class_="btn btn-primary") }}
+    </div>
+  </form>
+</div>
+{% endif %}
+
+{% if profil and profil.nb_cycles_enregistres %}
+<div class="card">
+  <h2>Profil personnel</h2>
+  <p class="hint">Statistiques sur les {{ profil.nb_cycles_enregistres }} derniers cycles clôturés — utilisées pour anticiper, jamais pour contourner les verrous.</p>
+  <dl class="stats-grid">
+    {% if profil.cycle_moyen %}
+      <dt>Cycle moyen</dt><dd>{{ "%.1f"|format(profil.cycle_moyen) }} jours</dd>
+    {% endif %}
+    {% if profil.cycle_min %}
+      <dt>Cycle le plus court</dt><dd>{{ profil.cycle_min }} jours</dd>
+    {% endif %}
+    {% if profil.cycle_max %}
+      <dt>Cycle le plus long</dt><dd>{{ profil.cycle_max }} jours</dd>
+    {% endif %}
+    {% if profil.jour_ovulation_moyen %}
+      <dt>Jour d'ovulation moyen</dt><dd>J{{ "%.0f"|format(profil.jour_ovulation_moyen) }}</dd>
+    {% endif %}
+    {% if profil.jour_apparition_glaire_moyen %}
+      <dt>Apparition glaire fertile (moy.)</dt><dd>J{{ "%.0f"|format(profil.jour_apparition_glaire_moyen) }}</dd>
+    {% endif %}
+    {% if profil.heure_prise_habituelle %}
+      <dt>Heure de prise habituelle</dt><dd>{{ profil.heure_prise_habituelle.strftime('%H:%M') }}</dd>
+    {% endif %}
+    {% if profil.pct_points_douteux is not none %}
+      <dt>Points douteux</dt><dd>{{ "%.0f"|format(profil.pct_points_douteux) }} %</dd>
+    {% endif %}
+    {% if profil.temp_plateau_bas %}
+      <dt>Plateau bas moyen</dt><dd>{{ "%.2f"|format(profil.temp_plateau_bas) }} °C</dd>
+    {% endif %}
+    {% if profil.amplitude_saut %}
+      <dt>Amplitude du saut</dt><dd>{{ "%.2f"|format(profil.amplitude_saut) }} °C</dd>
+    {% endif %}
+  </dl>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Cycles enregistrés</h2>
+  {% if cycles %}
+  <table class="table-cycle">
+    <thead>
+      <tr>
+        <th>Début règles</th>
+        <th>Fin</th>
+        <th>Durée</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in cycles %}
+      <tr>
+        <td>{{ c.date_debut_regles.strftime('%d/%m/%Y') }}</td>
+        <td>
+          {% if c.date_fin %}
+            {{ c.date_fin.strftime('%d/%m/%Y') }}
+          {% else %}
+            <em>en cours</em>
+          {% endif %}
+        </td>
+        <td>
+          {% if c.date_fin %}
+            {{ (c.date_fin - c.date_debut_regles).days + 1 }} j
+          {% else %}
+            —
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="hint">Aucun cycle enregistré.</p>
+  {% endif %}
+</div>
+{% endblock %}

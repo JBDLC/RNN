@@ -1,0 +1,23 @@
+{% macro afficher_feu(statut, phase_labels, feu_labels) %}
+{% if statut %}
+<div class="verdict-card feu-{{ statut.feu.value }}">
+  <div class="feu-indicateur" aria-label="Feu {{ feu_labels.get(statut.feu.value, statut.feu.value) }}">
+    <span class="feu-cercle"></span>
+    <span class="feu-texte">{{ feu_labels.get(statut.feu.value, statut.feu.value) }}</span>
+  </div>
+  <div class="verdict-detail">
+    <p class="verdict-phase">{{ phase_labels.get(statut.phase.value, statut.phase.value) }}
+      <span class="confiance confiance-{{ statut.confiance }}">({{ statut.confiance }})</span>
+    </p>
+    <ul class="verdict-messages">
+      {% for msg in statut.messages %}
+        <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<p class="disclaimer-verdict">
+  Ce verdict est une aide à la décision, pas une garantie. En cas de doute, consultez votre moniteur certifié.
+</p>
+{% endif %}
+{% endmacro %}

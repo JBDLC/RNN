@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_feu.html" import afficher_feu %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Régulation Naturelle des Naissances</h1>
+  <p>
+  Suivez vos observations quotidiennes et obtenez une indication de fertilité
+  selon la méthode de votre choix : Sensiplan, Billings ou CLER.
+  </p>
+
+  {% if current_user.is_authenticated %}
+    <div class="hero-actions">
+      <a href="{{ url_for('main.jour') }}" class="btn btn-primary">Saisir aujourd'hui</a>
+      <a href="{{ url_for('main.cycle') }}" class="btn btn-secondary">Voir mon cycle</a>
+    </div>
+  {% else %}
+    <div class="hero-actions">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Créer un compte</a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Se connecter</a>
+    </div>
+  {% endif %}
+</section>
+
+{% if statut_aujourdhui %}
+<div class="card">
+  <h2>Aujourd'hui</h2>
+  {{ afficher_feu(statut_aujourdhui, phase_labels, feu_labels) }}
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Comment ça marche ?</h2>
+  <ol>
+    <li><strong>Créez votre compte</strong> et confirmez votre adresse e-mail.</li>
+    <li><strong>Choisissez votre méthode</strong> et votre intention (éviter ou concevoir).</li>
+    <li><strong>Saisissez vos observations</strong> chaque jour — température, glaire, etc.</li>
+    <li><strong>Consultez le feu du jour</strong> avec une explication détaillée.</li>
+  </ol>
+</div>
+
+<div class="warning-box">
+  <strong>Important :</strong> cette application est un outil d'accompagnement.
+  Elle ne constitue pas une méthode contraceptive en elle-même.
+  Une formation auprès d'un moniteur certifié est indispensable.
+  <a href="{{ url_for('main.a_lire') }}">Lire les avertissements complets</a>
+</div>
+{% endblock %}

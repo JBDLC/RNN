@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block content %}
+<div class="auth-card card">
+  <h1>Créer un compte</h1>
+  <p>Chaque couple dispose de son propre espace privé pour suivre sa régulation naturelle.</p>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.email.label }}
+      {{ form.email(class_="", placeholder="vous@exemple.fr") }}
+      {% for error in form.email.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.password.label }}
+      {{ form.password() }}
+      {% for error in form.password.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.password_confirm.label }}
+      {{ form.password_confirm() }}
+      {% for error in form.password_confirm.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="form-group checkbox-group">
+      {{ form.accept_disclaimer() }}
+      <label for="accept_disclaimer">{{ form.accept_disclaimer.label.text }}</label>
+    </div>
+    {% for error in form.accept_disclaimer.errors %}
+      <div class="error">{{ error }}</div>
+    {% endfor %}
+
+    {{ form.submit(class_="btn btn-primary btn-block") }}
+  </form>
+
+  <p class="auth-footer">
+    Déjà un compte ? <a href="{{ url_for('auth.login') }}">Se connecter</a>
+  </p>
+</div>
+{% endblock %}

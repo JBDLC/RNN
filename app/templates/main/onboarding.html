@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "_macros.html" import radio_cards %}
+
+{% block title %}Configuration initiale{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1>Configuration initiale</h1>
+  <p>Choisissez votre méthode et vos préférences. Vous pourrez les modifier plus tard dans les réglages.</p>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+
+    <fieldset class="form-section">
+      <legend>Méthode</legend>
+      {{ radio_cards(form.methode) }}
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Intention</legend>
+      {{ radio_cards(form.intention) }}
+    </fieldset>
+
+    <div class="form-group">
+      {{ form.date_debut_regles.label }}
+      {{ form.date_debut_regles(type="date") }}
+      {% for error in form.date_debut_regles.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+      <p class="hint">Premier jour des dernières règles — début du cycle en cours.</p>
+    </div>
+
+    <fieldset class="form-section">
+      <legend>Gestion du décalage horaire</legend>
+      {{ radio_cards(form.mode_decalage) }}
+      <p class="hint">
+        <strong>Exclusion</strong> : une prise trop décalée est marquée douteuse et exclue du calcul thermique.<br>
+        <strong>Correction</strong> : la température est ajustée de ± 0,1 °C par heure d'écart.
+      </p>
+    </fieldset>
+
+    <div class="form-row">
+      <div class="form-group">
+        {{ form.heure_reference.label }}
+        {{ form.heure_reference(type="time") }}
+        <p class="hint">Laissez vide pour utiliser la médiane des heures de prise du cycle.</p>
+      </div>
+      <div class="form-group">
+        {{ form.seuil_decalage_min.label }}
+        {{ form.seuil_decalage_min() }}
+        {% for error in form.seuil_decalage_min.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {{ form.submit(class_="btn btn-primary btn-block") }}
+  </form>
+</div>
+{% endblock %}

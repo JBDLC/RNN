@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "_feu.html" import afficher_feu %}
+
+{% block title %}Cycle en cours{% endblock %}
+
+{% block extra_head %}
+{% if afficher_graphique %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>Cycle en cours</h1>
+<p class="meta-info">
+  Méthode : <strong>{{ methode_label }}</strong> —
+  Règles depuis le {{ cycle.date_debut_regles.strftime('%d/%m/%Y') }}
+  — Intention : {{ intention_label }}
+</p>
+
+{% if statut_aujourdhui %}
+<h2>Verdict du jour</h2>
+{{ afficher_feu(statut_aujourdhui, phase_labels, feu_labels) }}
+{% else %}
+<div class="warning-box">
+  <p>Aucune observation aujourd'hui. <a href="{{ url_for('main.jour') }}">Saisir maintenant</a></p>
+</div>
+{% endif %}
+
+{% if afficher_graphique and graphique %}
+<div class="card">
+  <h2>Courbe de température</h2>
+  <canvas id="courbe-temp" height="120"></canvas>
+  <p class="hint">
+    Ligne pointillée = ligne de référence (plus haute des 6 basses).
+    Points rouges = trois points hauts. Gris = points douteux.
+    {% if graphique.pic_index is not none %}
+      ▲ Sommet de glaire marqué sur le graphique.
+    {% endif %}
+  </p>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Journal du cycle</h2>
+  {% if jours_avec_statut %}
+  <table class="table-cycle">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Feu</th>
+        <th>Phase</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obs, statut in jours_avec_statut %}
+      <tr>
+        <td>{{ obs.date.strftime('%d/%m/%Y') }}</td>
+        <td><span class="feu-badge feu-{{ statut.feu.value }}">{{ feu_labels.get(statut.feu.value) }}</span></td>
+        <td>{{ phase_labels.get(statut.phase.value) }}</td>
+        <td><a href="{{ url_for('main.jour', date=obs.date.isoformat()) }}">Modifier</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="hint">Aucune observation enregistrée. <a href="{{ url_for('main.jour') }}">Commencer la saisie</a></p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if afficher_graphique and graphique %}
+<script>
+  const graphData = {{ graphique | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/courbe.js') }}"></script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "_macros.html" import radio_cards %}
+
+{% block title %}Réglages{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1>Réglages</h1>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+
+    <fieldset class="form-section">
+      <legend>Méthode</legend>
+      {{ radio_cards(form.methode) }}
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Intention</legend>
+      {{ radio_cards(form.intention) }}
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Gestion du décalage horaire</legend>
+      {{ radio_cards(form.mode_decalage) }}
+    </fieldset>
+
+    <div class="form-row">
+      <div class="form-group">
+        {{ form.heure_reference.label }}
+        {{ form.heure_reference(type="time") }}
+        <p class="hint">Vide = médiane auto des prises du cycle.</p>
+      </div>
+      <div class="form-group">
+        {{ form.seuil_decalage_min.label }}
+        {{ form.seuil_decalage_min() }}
+        {% for error in form.seuil_decalage_min.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if heure_ref_effective %}
+      <p class="info-decalage">
+        Heure de référence effective actuelle : <strong>{{ heure_ref_effective.strftime('%H:%M') }}</strong>
+      </p>
+    {% endif %}
+
+    {{ form.submit(class_="btn btn-primary") }}
+  </form>
+</div>
+
+{% if cycle %}
+<div class="card">
+  <h2>Cycle en cours</h2>
+  <p>Début des règles : {{ cycle.date_debut_regles.strftime('%d/%m/%Y') }}</p>
+  <p class="hint">La clôture de cycle sera disponible à l'étape historique.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmez votre compte</title>
+</head>
+<body style="font-family: sans-serif; line-height: 1.6; color: #333;">
+  <h1>Bienvenue sur RNN App</h1>
+  <p>Bonjour,</p>
+  <p>Merci de vous être inscrit(e). Pour activer votre compte et accéder à votre espace personnel, confirmez votre adresse e-mail :</p>
+  <p>
+    <a href="{{ verify_url }}" style="display:inline-block;padding:12px 24px;background:#4a6741;color:white;text-decoration:none;border-radius:8px;">
+      Confirmer mon adresse e-mail
+    </a>
+  </p>
+  <p>Ou copiez ce lien dans votre navigateur :<br>{{ verify_url }}</p>
+  <p><small>Ce lien expire dans 48 heures. Si vous n'avez pas créé de compte, ignorez ce message.</small></p>
+</body>
+</html>

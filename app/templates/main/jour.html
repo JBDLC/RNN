@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% from "_feu.html" import afficher_feu %}
+
+{% block title %}Saisie du {{ jour_cible.strftime('%d/%m/%Y') }}{% endblock %}
+
+{% block content %}
+<div class="date-nav">
+  {% if jour_precedent %}
+    <a href="{{ url_for('main.jour', date=jour_precedent.isoformat()) }}" class="btn btn-secondary">← Jour précédent</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+  <h1>{{ jour_cible.strftime('%A %d %B %Y') }}</h1>
+  {% if jour_suivant %}
+    <a href="{{ url_for('main.jour', date=jour_suivant.isoformat()) }}" class="btn btn-secondary">Jour suivant →</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+</div>
+
+<p class="meta-info">
+  Méthode : <strong>{{ methode_label }}</strong> —
+  Cycle commencé le {{ cycle.date_debut_regles.strftime('%d/%m/%Y') }}
+  {% if heure_reference %}
+    — Heure de référence : {{ heure_reference.strftime('%H:%M') }}
+  {% endif %}
+</p>
+
+{% if statut %}
+<h2>Verdict de ce jour</h2>
+{{ afficher_feu(statut, phase_labels, feu_labels) }}
+{% endif %}
+
+<div class="card">
+  <form method="POST" novalidate id="form-observation">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.date_obs.label }}
+      {{ form.date_obs(type="date", max=today.isoformat()) }}
+      {% for error in form.date_obs.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+      <p class="hint">Modifiez la date pour saisir un jour passé (ex. union de la veille).</p>
+    </div>
+
+    {% if afficher_temperature %}
+    <fieldset class="form-section">
+      <legend>Température</legend>
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.temp_brute.label }}
+          {{ form.temp_brute(step="0.01", placeholder="36.50") }}
+          {% for error in form.temp_brute.errors %}
+            <div class="error">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="form-group">
+          {{ form.heure_prise.label }}
+          {{ form.heure_prise(type="time") }}
+          {% for error in form.heure_prise.errors %}
+            <div class="error">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% if info_decalage %}
+        <p class="info-decalage">{{ info_decalage }}</p>
+      {% endif %}
+    </fieldset>
+    {% endif %}
+
+    <fieldset class="form-section">
+      <legend>Glaire cervicale</legend>
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.glaire_sensation.label }}
+          {{ form.glaire_sensation(class_="select-field") }}
+        </div>
+        <div class="form-group">
+          {{ form.glaire_aspect.label }}
+          {{ form.glaire_aspect(class_="select-field") }}
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="form-group checkbox-group">
+      {{ form.union() }}
+      <label for="union">Union ce jour-là</label>
+    </div>
+
+    <details class="form-details">
+      <summary>Options avancées (col, saignement, test LH)</summary>
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.saignement.label }}
+          {{ form.saignement(class_="select-field") }}
+        </div>
+        <div class="form-group">
+          {{ form.test_lh.label }}
+          {{ form.test_lh(class_="select-field") }}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.col_hauteur.label }}
+          {{ form.col_hauteur(class_="select-field") }}
+        </div>
+        <div class="form-group">
+          {{ form.col_ouverture.label }}
+          {{ form.col_ouverture(class_="select-field") }}
+        </div>
+        <div class="form-group">
+          {{ form.col_consistance.label }}
+          {{ form.col_consistance(class_="select-field") }}
+        </div>
+      </div>
+    </details>
+
+    <fieldset class="form-section doute-section">
+      <legend>Point douteux</legend>
+      <div class="form-group checkbox-group">
+        {{ form.douteux_manuel(id="douteux_manuel") }}
+        <label for="douteux_manuel">Marquer manuellement comme point douteux</label>
+      </div>
+      <div class="form-group" id="motif-doute-group">
+        {{ form.motif_doute.label }}
+        {{ form.motif_doute(class_="select-field") }}
+        {% for error in form.motif_doute.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <p class="hint">Fièvre, alcool, sommeil perturbé, voyage… Les points douteux sont exclus du calcul thermique.</p>
+    </fieldset>
+
+    {{ form.submit(class_="btn btn-primary btn-block") }}
+  </form>
+</div>
+
+{% if obs_existante and obs_existante.douteux %}
+<div class="warning-box">
+  <strong>Point douteux</strong>
+  {% if obs_existante.motif_doute %}
+    — motif : {{ obs_existante.motif_doute | replace('_', ' ') }}
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/saisie.js') }}"></script>
+{% endblock %}

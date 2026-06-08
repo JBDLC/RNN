@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}À lire absolument{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1>À lire absolument</h1>
+
+  <div class="warning-box">
+    <p><strong>Cette application n'est PAS un dispositif médical.</strong></p>
+    <p>Elle ne constitue pas une méthode contraceptive et ne remplace en aucun cas l'apprentissage auprès d'un moniteur certifié.</p>
+  </div>
+
+  <h2>Avertissement médical</h2>
+  <ul>
+    <li>Cette application <strong>n'est pas un dispositif médical</strong> et n'a pas vocation à diagnostiquer, traiter ou prévenir une maladie.</li>
+    <li>Elle <strong>ne remplace pas</strong> une méthode contraceptive validée ni un avis médical.</li>
+    <li>L'efficacité de la régulation naturelle dépend entièrement de la <strong>qualité de vos observations</strong> et de votre <strong>formation</strong>.</li>
+    <li>Un feu vert affiché par l'application <strong>ne garantit pas l'infertilité</strong> : seules les règles strictes de confirmation de votre méthode s'appliquent.</li>
+  </ul>
+
+  <h2>Situations à risque accru d'erreur</h2>
+  <ul>
+    <li><strong>Post-partum</strong> et <strong>allaitement</strong> — cycles souvent irréguliers</li>
+    <li><strong>Arrêt de la pilule</strong> ou d'un contraceptif hormonal</li>
+    <li><strong>Cycles atypiques</strong>, stress prolongé, voyage avec décalage horaire</li>
+    <li><strong>Fièvre, maladie, alcool, sommeil perturbé</strong> — observations thermiques non fiables</li>
+  </ul>
+
+  <h2>Ce que fait (et ne fait pas) cette application</h2>
+  <ul>
+    <li>✅ Aide à enregistrer vos observations et applique les règles de calcul de la méthode choisie</li>
+    <li>✅ Affiche un feu (vert / orange / rouge) avec une explication</li>
+    <li>❌ Ne dispense pas de formation à la méthode</li>
+    <li>❌ Ne remplace pas le jugement d'un couple formé ni d'un moniteur certifié</li>
+    <li>❌ N'utilise pas l'historique pour raccourcir les délais de confirmation (double verrou toujours respecté)</li>
+  </ul>
+
+  <h2>Se former auprès d'un moniteur certifié</h2>
+  <p>La formation en présentiel ou à distance avec un moniteur certifié est <strong>indispensable</strong> avant de vous fier à cette application.</p>
+  <ul>
+    <li><strong>CLER</strong> — méthode des trois points hauts — <a href="https://www.ler.org" target="_blank" rel="noopener">ler.org</a></li>
+    <li><strong>Sensiplan</strong> — sympto-thermique — <a href="https://www.sensiplan.org" target="_blank" rel="noopener">sensiplan.org</a></li>
+    <li><strong>WOOMB / Billings</strong> — glaire cervicale — <a href="https://www.woombinternational.org" target="_blank" rel="noopener">woombinternational.org</a></li>
+  </ul>
+
+  {% if current_user.is_authenticated %}
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-primary">J'ai lu et compris — continuer</button>
+  </form>
+  {% else %}
+  <p><a href="{{ url_for('auth.register') }}" class="btn btn-primary">Créer un compte</a></p>
+  {% endif %}
+</div>
+{% endblock %}
