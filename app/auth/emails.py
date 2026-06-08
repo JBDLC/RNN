@@ -1,11 +1,28 @@
-from flask import current_app, render_template, url_for
+from flask import current_app, render_template
 from flask_mail import Message
 
 from app.extensions import mail
 
 
+def is_mail_configured() -> bool:
+  """Vérifie que le SMTP est configuré (évite un blocage sur localhost)."""
+  cfg = current_app.config
+  if not cfg.get("MAIL_USERNAME") or not cfg.get("MAIL_PASSWORD"):
+    return False
+  server = (cfg.get("MAIL_SERVER") or "").strip()
+  if not server or server in ("localhost", "127.0.0.1"):
+    return False
+  return True
+
+
 def send_verification_email(user) -> bool:
   """Envoie l'e-mail de validation de compte. Retourne True si envoyé."""
+  if not is_mail_configured():
+    current_app.logger.warning(
+      "E-mail non configuré : définir MAIL_SERVER, MAIL_USERNAME et MAIL_PASSWORD sur Render."
+    )
+    return False
+
   token = user.verification_token
   if not token:
     token = user.generate_verification_token()

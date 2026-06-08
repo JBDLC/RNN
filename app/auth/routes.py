@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from app.auth.emails import send_verification_email
+from app.auth.emails import is_mail_configured, send_verification_email
 from app.auth.forms import LoginForm, RegisterForm
 from app.extensions import db
 from app.models import ProfilPersonnel, User
@@ -29,6 +29,12 @@ def register():
       flash(
         "Compte créé ! Consultez votre boîte e-mail pour confirmer votre adresse avant de vous connecter.",
         "success",
+      )
+    elif not is_mail_configured():
+      flash(
+        "Compte créé, mais l'envoi d'e-mails n'est pas encore configuré sur le serveur. "
+        "L'administrateur doit renseigner MAIL_SERVER, MAIL_USERNAME et MAIL_PASSWORD sur Render.",
+        "warning",
       )
     else:
       flash(
@@ -119,8 +125,17 @@ def resend_verification():
 
   if send_verification_email(user):
     flash("Un nouvel e-mail de vérification a été envoyé.", "success")
+  elif not is_mail_configured():
+    flash(
+      "L'envoi d'e-mails n'est pas configuré sur le serveur "
+      "(MAIL_SERVER, MAIL_USERNAME, MAIL_PASSWORD). Contactez l'administrateur.",
+      "danger",
+    )
   else:
-    flash("Impossible d'envoyer l'e-mail. Réessayez plus tard.", "danger")
+    flash(
+      "Impossible d'envoyer l'e-mail (vérifiez les identifiants SMTP). Réessayez plus tard.",
+      "danger",
+    )
 
   return redirect(url_for("auth.login"))
 

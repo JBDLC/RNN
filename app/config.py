@@ -21,6 +21,7 @@ class Config:
   MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
   MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
   MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "noreply@rnn-app.local")
+  MAIL_TIMEOUT = int(os.environ.get("MAIL_TIMEOUT", 10))
   # Sur Render, RENDER_EXTERNAL_URL est injecté automatiquement (ex. https://rnn-app.onrender.com)
   BASE_URL = os.environ.get(
     "BASE_URL",
