@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}RNN App{% endblock %} — Régulation Naturelle des Naissances</title>
+  <title>{% block title %}Accueil{% endblock %} — Tandem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -13,19 +17,27 @@
     <a href="{{ url_for('main.a_lire') }}">En savoir plus</a>
   </div>
 
-  <header>
+  <header class="site-header">
     <div class="header-inner">
-      <a href="{{ url_for('main.accueil') }}" class="logo">RNN App</a>
+      <a href="{{ url_for('main.accueil') }}" class="brand">
+        <span class="logo-medallion" aria-hidden="true">
+          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" class="logo-medallion-img">
+        </span>
+        <span class="brand-text">
+          <span class="brand-name">Tandem</span>
+          <span class="brand-tagline">Régulation naturelle des naissances</span>
+        </span>
+      </a>
       <nav>
         {% if current_user.is_authenticated %}
           <a href="{{ url_for('main.jour') }}">Aujourd'hui</a>
           <a href="{{ url_for('main.cycle') }}">Cycle</a>
           <a href="{{ url_for('main.historique') }}">Historique</a>
           <a href="{{ url_for('main.reglages') }}">Réglages</a>
-          <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
+          <a href="{{ url_for('auth.logout') }}" class="nav-muted">Déconnexion</a>
         {% else %}
           <a href="{{ url_for('auth.login') }}">Connexion</a>
-          <a href="{{ url_for('auth.register') }}">Créer un compte</a>
+          <a href="{{ url_for('auth.register') }}" class="nav-cta">Créer un compte</a>
         {% endif %}
       </nav>
     </div>
@@ -45,8 +57,9 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer>
-    RNN App — Outil d'accompagnement, pas de contraception. Consultez un moniteur certifié (CLER, Sensiplan, WOOMB/Billings).
+  <footer class="site-footer">
+    <strong>Tandem</strong> — Outil d'accompagnement, pas de contraception.
+    Consultez un moniteur certifié (CLER, Sensiplan, WOOMB/Billings).
   </footer>
 
   {% block extra_scripts %}{% endblock %}

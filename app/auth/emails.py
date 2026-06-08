@@ -39,7 +39,7 @@ def send_verification_email(user) -> bool:
   verify_url = f"{current_app.config['BASE_URL']}/auth/verify/{token}"
 
   msg = Message(
-    subject="Confirmez votre compte — RNN App",
+    subject="Confirmez votre compte — Tandem",
     recipients=[user.email],
     html=render_template("auth/email_verify.html", user=user, verify_url=verify_url),
     body=(
@@ -47,7 +47,7 @@ def send_verification_email(user) -> bool:
       f"Merci de vous être inscrit(e) sur l'application RNN.\n"
       f"Confirmez votre adresse e-mail en cliquant sur ce lien :\n{verify_url}\n\n"
       f"Ce lien expire dans 48 heures.\n\n"
-      f"— L'équipe RNN App"
+      f"— L'équipe Tandem"
     ),
   )
 

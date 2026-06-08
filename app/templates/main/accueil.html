@@ -5,10 +5,17 @@
 
 {% block content %}
 <section class="hero">
-  <h1>Régulation Naturelle des Naissances</h1>
-  <p>
-  Suivez vos observations quotidiennes et obtenez une indication de fertilité
-  selon la méthode de votre choix : Sensiplan, Billings ou CLER.
+  <div class="hero-logo-wrap">
+    <div class="hero-logo-ring"></div>
+    <img
+      src="{{ url_for('static', filename='img/logo.png') }}"
+      alt="Tandem — Régulation naturelle des naissances"
+      class="hero-logo"
+    >
+  </div>
+  <p class="hero-lead">
+    Suivez vos observations quotidiennes et obtenez une indication de fertilité
+    selon la méthode de votre choix : Sensiplan, Billings ou CLER.
   </p>
 
   {% if current_user.is_authenticated %}

@@ -93,7 +93,7 @@ def donnees_graphique(cycle, user) -> dict | None:
         point_styles.append("#c0392b")
         point_radius.append(9)
       else:
-        point_styles.append("#2d8a4e")
+        point_styles.append("#5a9b91")
         point_radius.append(5)
       border_dash.append([])
 

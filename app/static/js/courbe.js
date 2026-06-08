@@ -11,7 +11,7 @@
     {
       label: "Température",
       data: graphData.data_corrigee,
-      borderColor: "#4a6741",
+      borderColor: "#5a9b91",
       backgroundColor: pointColors,
       pointBackgroundColor: pointColors,
       pointBorderColor: pointColors,
@@ -26,7 +26,7 @@
     datasets.push({
       label: "Ligne de référence",
       data: graphData.ligne_reference,
-      borderColor: "#d97706",
+      borderColor: "#e88f70",
       borderDash: [6, 4],
       pointRadius: 0,
       borderWidth: 2,
