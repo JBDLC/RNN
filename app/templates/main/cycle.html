@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% from "_feu.html" import afficher_feu %}
 
-{% block title %}Cycle en cours{% endblock %}
+{% block title %}Cycle{% endblock %}
+{% block body_class %}page-cycle{% endblock %}
 
 {% block extra_head %}
 {% if afficher_graphique %}
@@ -10,40 +11,53 @@
 {% endblock %}
 
 {% block content %}
-<h1>Cycle en cours</h1>
-<p class="meta-info">
-  Méthode : <strong>{{ methode_label }}</strong> —
-  Règles depuis le {{ cycle.date_debut_regles.strftime('%d/%m/%Y') }}
-  — Intention : {{ intention_label }}
-</p>
+<div class="page-top-bar page-top-bar--simple">
+  <h1 class="page-title">Mon cycle</h1>
+  <a href="{{ url_for('main.jour') }}" class="btn btn-primary btn-sm-mobile">Saisir aujourd'hui</a>
+</div>
 
 {% if statut_aujourdhui %}
-<h2>Verdict du jour</h2>
-{{ afficher_feu(statut_aujourdhui, phase_labels, feu_labels) }}
+<div class="card card-compact">
+  <h2 class="card-title-sm">Verdict du jour</h2>
+  {{ afficher_feu(statut_aujourdhui, phase_labels, feu_labels) }}
+</div>
 {% else %}
-<div class="warning-box">
-  <p>Aucune observation aujourd'hui. <a href="{{ url_for('main.jour') }}">Saisir maintenant</a></p>
+<div class="warning-box warning-box--compact">
+  <p>Pas d'observation aujourd'hui. <a href="{{ url_for('main.jour') }}">Saisir maintenant</a></p>
 </div>
 {% endif %}
+
+<details class="meta-collapse">
+  <summary>Détails du cycle</summary>
+  <p class="meta-info meta-info--plain">
+    Méthode : <strong>{{ methode_label }}</strong> —
+    Règles depuis le {{ cycle.date_debut_regles.strftime('%d/%m/%Y') }}
+    — Intention : {{ intention_label }}
+  </p>
+</details>
 
 {% if afficher_graphique and graphique %}
 <div class="card">
-  <h2>Courbe de température</h2>
-  <canvas id="courbe-temp" height="120"></canvas>
-  <p class="hint">
-    Ligne pointillée = ligne de référence (plus haute des 6 basses).
-    Points rouges = trois points hauts. Gris = points douteux.
-    {% if graphique.pic_index is not none %}
-      ▲ Sommet de glaire marqué sur le graphique.
-    {% endif %}
-  </p>
+  <h2 class="card-title-sm">Courbe de température</h2>
+  <div class="chart-wrap">
+    <canvas id="courbe-temp" height="120"></canvas>
+  </div>
 </div>
 {% endif %}
 
 <div class="card">
-  <h2>Journal du cycle</h2>
+  <h2 class="card-title-sm">Journal</h2>
   {% if jours_avec_statut %}
-  <table class="table-cycle">
+  <div class="journal-list">
+    {% for obs, statut in jours_avec_statut %}
+    <a href="{{ url_for('main.jour', date=obs.date.isoformat()) }}" class="journal-item">
+      <span class="journal-date">{{ obs.date.strftime('%d/%m') }}</span>
+      <span class="feu-badge feu-{{ statut.feu.value }}">{{ feu_labels.get(statut.feu.value) }}</span>
+      <span class="journal-phase">{{ phase_labels.get(statut.phase.value) }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  <table class="table-cycle table-cycle--desktop">
     <thead>
       <tr>
         <th>Date</th>
@@ -64,7 +78,7 @@
     </tbody>
   </table>
   {% else %}
-  <p class="hint">Aucune observation enregistrée. <a href="{{ url_for('main.jour') }}">Commencer la saisie</a></p>
+  <p class="hint">Aucune observation. <a href="{{ url_for('main.jour') }}">Commencer</a></p>
   {% endif %}
 </div>
 {% endblock %}

@@ -3,7 +3,44 @@
 
 {% block title %}Accueil{% endblock %}
 
+{% block body_class %}{% if current_user.is_authenticated %}page-home-auth{% endif %}{% endblock %}
+
 {% block content %}
+{% if current_user.is_authenticated %}
+<section class="quick-actions">
+  <a href="{{ url_for('main.jour') }}" class="quick-action-btn quick-action-primary">
+    <span class="quick-action-icon">✎</span>
+    <span class="quick-action-label">Saisir aujourd'hui</span>
+  </a>
+  <a href="{{ url_for('main.cycle') }}" class="quick-action-btn quick-action-secondary">
+    <span class="quick-action-icon">◉</span>
+    <span class="quick-action-label">Voir mon cycle</span>
+  </a>
+</section>
+
+{% if statut_aujourdhui %}
+<div class="card card-compact">
+  <h2 class="card-title-sm">Aujourd'hui</h2>
+  {{ afficher_feu(statut_aujourdhui, phase_labels, feu_labels) }}
+</div>
+{% endif %}
+
+<details class="mobile-collapse">
+  <summary>À propos de Tandem</summary>
+  <div class="hero hero--compact">
+    <img
+      src="{{ url_for('static', filename='img/logo.png') }}"
+      alt="Tandem"
+      class="hero-logo hero-logo--sm"
+    >
+    <p class="hero-lead">
+      Suivez vos observations et obtenez une indication de fertilité
+      (Sensiplan, Billings ou CLER).
+    </p>
+  </div>
+</details>
+
+{% else %}
 <section class="hero">
   <div class="hero-logo-wrap">
     <div class="hero-logo-ring"></div>
@@ -17,26 +54,11 @@
     Suivez vos observations quotidiennes et obtenez une indication de fertilité
     selon la méthode de votre choix : Sensiplan, Billings ou CLER.
   </p>
-
-  {% if current_user.is_authenticated %}
-    <div class="hero-actions">
-      <a href="{{ url_for('main.jour') }}" class="btn btn-primary">Saisir aujourd'hui</a>
-      <a href="{{ url_for('main.cycle') }}" class="btn btn-secondary">Voir mon cycle</a>
-    </div>
-  {% else %}
-    <div class="hero-actions">
-      <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Créer un compte</a>
-      <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Se connecter</a>
-    </div>
-  {% endif %}
+  <div class="hero-actions">
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Créer un compte</a>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-lg">Se connecter</a>
+  </div>
 </section>
-
-{% if statut_aujourdhui %}
-<div class="card">
-  <h2>Aujourd'hui</h2>
-  {{ afficher_feu(statut_aujourdhui, phase_labels, feu_labels) }}
-</div>
-{% endif %}
 
 <div class="card">
   <h2>Comment ça marche ?</h2>
@@ -54,4 +76,5 @@
   Une formation auprès d'un moniteur certifié est indispensable.
   <a href="{{ url_for('main.a_lire') }}">Lire les avertissements complets</a>
 </div>
+{% endif %}
 {% endblock %}
