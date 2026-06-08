@@ -57,9 +57,12 @@ Puis **Save Changes** (redéploiement automatique).
 
 ```
 pip install -r requirements.txt     ← buildCommand
-flask db upgrade                    ← preDeployCommand (crée/met à jour les tables)
-gunicorn run:app                    ← startCommand
+bash start.sh                       ← startCommand
+  └─ flask db upgrade               ← crée/met à jour les tables PostgreSQL
+  └─ gunicorn run:app               ← démarrage du serveur
 ```
+
+> **Note :** le plan gratuit Render ne supporte pas `preDeployCommand`. Les migrations sont donc exécutées au démarrage via `start.sh`.
 
 ## Plan gratuit Render
 
