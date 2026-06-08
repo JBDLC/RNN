@@ -31,6 +31,9 @@ class Config:
   # Durée de validité du lien de vérification e-mail
   EMAIL_VERIFY_TOKEN_MAX_AGE = timedelta(hours=48)
 
+  # Test / Render gratuit (SMTP bloqué) : contourne la validation e-mail
+  SKIP_EMAIL_VERIFICATION = os.environ.get("SKIP_EMAIL_VERIFICATION", "false").lower() == "true"
+
   # Session
   REMEMBER_COOKIE_DURATION = timedelta(days=30)
   _on_render = os.environ.get("RENDER") == "true"

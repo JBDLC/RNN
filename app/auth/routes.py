@@ -1,12 +1,18 @@
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from app.auth.emails import is_mail_configured, send_verification_email
+from app.auth.emails import is_mail_configured, send_verification_email, skip_email_verification
 from app.auth.forms import LoginForm, RegisterForm
 from app.extensions import db
 from app.models import ProfilPersonnel, User
 
 from . import auth_bp
+
+
+def _valider_email_auto(user: User) -> None:
+  """Marque l'e-mail comme vérifié (mode test)."""
+  user.email_verified = True
+  user.verification_token = None
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -18,30 +24,37 @@ def register():
   if form.validate_on_submit():
     user = User(email=form.email.data.lower().strip())
     user.set_password(form.password.data)
-    user.generate_verification_token()
+
+    if skip_email_verification():
+      _valider_email_auto(user)
+    else:
+      user.generate_verification_token()
 
     db.session.add(user)
     db.session.add(ProfilPersonnel(user=user))
     db.session.commit()
 
-    email_sent = send_verification_email(user)
-    if email_sent:
-      flash(
-        "Compte créé ! Consultez votre boîte e-mail pour confirmer votre adresse avant de vous connecter.",
-        "success",
-      )
-    elif not is_mail_configured():
-      flash(
-        "Compte créé, mais l'envoi d'e-mails n'est pas encore configuré sur le serveur. "
-        "L'administrateur doit renseigner MAIL_SERVER, MAIL_USERNAME et MAIL_PASSWORD sur Render.",
-        "warning",
-      )
+    if skip_email_verification():
+      flash("Compte créé ! Vous pouvez vous connecter directement (validation e-mail désactivée).", "success")
     else:
-      flash(
-        "Compte créé, mais l'e-mail de vérification n'a pas pu être envoyé. "
-        "Utilisez « Renvoyer la vérification » depuis la page de connexion.",
-        "warning",
-      )
+      email_sent = send_verification_email(user)
+      if email_sent:
+        flash(
+          "Compte créé ! Consultez votre boîte e-mail pour confirmer votre adresse avant de vous connecter.",
+          "success",
+        )
+      elif not is_mail_configured():
+        flash(
+          "Compte créé, mais l'envoi d'e-mails n'est pas encore configuré sur le serveur. "
+          "L'administrateur doit renseigner MAIL_SERVER, MAIL_USERNAME et MAIL_PASSWORD sur Render.",
+          "warning",
+        )
+      else:
+        flash(
+          "Compte créé, mais l'e-mail de vérification n'a pas pu être envoyé. "
+          "Utilisez « Renvoyer la vérification » depuis la page de connexion.",
+          "warning",
+        )
     return redirect(url_for("auth.login"))
 
   return render_template("auth/register.html", form=form)
@@ -62,7 +75,7 @@ def login():
       flash("E-mail ou mot de passe incorrect.", "danger")
       return render_template("auth/login.html", form=form)
 
-    if not user.email_verified:
+    if not user.email_verified and not skip_email_verification():
       unverified_email = user.email
       flash(
         "Votre adresse e-mail n'est pas encore vérifiée. Consultez votre boîte de réception.",
@@ -84,7 +97,11 @@ def login():
     flash("Connexion réussie.", "success")
     return redirect(url_for("main.accueil"))
 
-  return render_template("auth/login.html", form=form)
+  return render_template(
+    "auth/login.html",
+    form=form,
+    skip_email_verification=skip_email_verification(),
+  )
 
 
 @auth_bp.route("/verify/<token>")
@@ -105,6 +122,10 @@ def verify_email(token):
 
 @auth_bp.route("/resend-verification", methods=["POST"])
 def resend_verification():
+  if skip_email_verification():
+    flash("La validation par e-mail est désactivée — connectez-vous directement.", "info")
+    return redirect(url_for("auth.login"))
+
   email = request.form.get("email", "").lower().strip()
 
   if not email:

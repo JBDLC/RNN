@@ -58,6 +58,26 @@ def test_login_blocked_until_verified(client):
   assert "pas encore" in text or "vérifiée" in text
 
 
+def test_skip_email_verification(client, app):
+  app.config["SKIP_EMAIL_VERIFICATION"] = True
+  client.post("/auth/register", data={
+    "email": "skip@example.com",
+    "password": "motdepasse123",
+    "password_confirm": "motdepasse123",
+    "accept_disclaimer": True,
+  })
+  user = User.query.filter_by(email="skip@example.com").first()
+  assert user.email_verified is True
+
+  response = client.post("/auth/login", data={
+    "email": "skip@example.com",
+    "password": "motdepasse123",
+  }, follow_redirects=True)
+  assert response.status_code == 200
+  text = response.data.decode("utf-8").lower()
+  assert "déconnexion" in text
+
+
 def test_verify_email_allows_login(client):
   client.post("/auth/register", data={
     "email": "test@example.com",

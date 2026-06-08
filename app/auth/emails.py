@@ -4,8 +4,14 @@ from flask_mail import Message
 from app.extensions import mail
 
 
+def skip_email_verification() -> bool:
+  return current_app.config.get("SKIP_EMAIL_VERIFICATION", False)
+
+
 def is_mail_configured() -> bool:
   """Vérifie que le SMTP est configuré (évite un blocage sur localhost)."""
+  if skip_email_verification():
+    return False
   cfg = current_app.config
   if not cfg.get("MAIL_USERNAME") or not cfg.get("MAIL_PASSWORD"):
     return False
@@ -17,9 +23,12 @@ def is_mail_configured() -> bool:
 
 def send_verification_email(user) -> bool:
   """Envoie l'e-mail de validation de compte. Retourne True si envoyé."""
+  if skip_email_verification():
+    return False
+
   if not is_mail_configured():
     current_app.logger.warning(
-      "E-mail non configuré : définir MAIL_SERVER, MAIL_USERNAME et MAIL_PASSWORD sur Render."
+      "E-mail non configuré : définir MAIL_SERVER, MAIL_USERNAME et MAIL_PASSWORD."
     )
     return False
 
