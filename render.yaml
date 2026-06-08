@@ -32,6 +32,9 @@ services:
           property: connectionString
       - key: FLASK_ENV
         value: production
+      # Render gratuit bloque SMTP (ports 587/465) — désactive la validation e-mail pour les tests
+      - key: SKIP_EMAIL_VERIFICATION
+        value: "true"
       - key: BASE_URL
         sync: false
       - key: MAIL_SERVER
